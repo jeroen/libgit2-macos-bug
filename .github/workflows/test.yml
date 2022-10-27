@@ -1,0 +1,27 @@
+on:
+  push:
+
+name: Build and run example
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    name: Test on ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ macos-10.15, macos-11, macos-12 ]
+    steps:
+      - uses: actions/checkout@v2
+      - shell: bash
+        run: |
+          brew install libgit2 || true
+          clang test.c -o test $(pkg-config --libs --cflags libgit2)
+      - shell: bash
+        run: |
+          for run in {1..50}; do
+            echo "Testing run $run!"
+            rm -Rf output;
+            ./test
+          done
